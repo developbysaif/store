@@ -1,0 +1,33 @@
+export const storeConfig = {
+  brandName: process.env.NEXT_PUBLIC_BRAND_NAME || "MAISON ATELIER",
+  brandMonogram: "M·A",
+  tagline: "Timeless Design. Modern Essence.",
+  subTagline: "A refined curation of luxury clothing, watches, jewellery & accessories.",
+  contactEmail: "concierge@maisonatelier.com",
+  contactPhone: "+92 (0) 42 3578 9900",
+  whatsappNumber: "+923001234567",
+  address: "Gulberg III, M.M. Alam Road, Lahore, Pakistan",
+  announcementMessages: [
+    "Complimentary express shipping across Pakistan on orders over ₨ 7,500",
+    "Worldwide express courier delivery available with DHL Express",
+    "Cash on Delivery (COD) available nationwide in Pakistan",
+    "New Luxury Editorial Collection 2026 is now live",
+  ],
+  freeShippingThresholdPKR: 7500,
+  freeShippingThresholdUSD: 150,
+  standardShippingPKR: 299,
+  standardShippingUSD: 15,
+  internationalShippingUSD: 35,
+  socialLinks: {
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    pinterest: "https://pinterest.com",
+    tiktok: "https://tiktok.com",
+  },
+  supportedCurrencies: [
+    { code: "PKR", symbol: "₨", name: "Pakistani Rupee", exchangeRateToUSD: 0.0036 },
+    { code: "USD", symbol: "$", name: "US Dollar", exchangeRateToUSD: 1.0 },
+    { code: "GBP", symbol: "£", name: "British Pound", exchangeRateToUSD: 1.28 },
+    { code: "EUR", symbol: "€", name: "Euro", exchangeRateToUSD: 1.08 },
+  ],
+};

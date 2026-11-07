@@ -1,0 +1,144 @@
+[
+  {
+    "id": "ord-1",
+    "orderNumber": "ORD-2026-982101",
+    "customer": {
+      "fullName": "Hamza Malik",
+      "email": "hamza@example.com",
+      "phone": "0300-8451122",
+      "addressLine1": "House 12-A, DHA Phase 6",
+      "city": "Lahore",
+      "country": "Pakistan"
+    },
+    "items": [
+      {
+        "productId": "prod-3",
+        "productName": "The Sovereign Rose Gold Chronograph 41mm",
+        "productImage": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1000&auto=format&fit=crop",
+        "sku": "WTC-SOV-RG-BLK",
+        "price": 38500,
+        "quantity": 1
+      }
+    ],
+    "market": "PK",
+    "currency": "PKR",
+    "subtotal": 38500,
+    "shippingCost": 0,
+    "discount": 0,
+    "total": 38500,
+    "paymentMethod": "COD",
+    "paymentStatus": "PENDING",
+    "orderStatus": "DISPATCHED",
+    "trackingNumber": "TCS-991203",
+    "courierName": "TCS Express",
+    "createdAt": "2026-03-28T10:30:00Z",
+    "updatedAt": "2026-11-07T12:01:23.905Z"
+  },
+  {
+    "id": "ord-2",
+    "orderNumber": "ORD-2026-982100",
+    "customer": {
+      "fullName": "Amina Tariq",
+      "email": "amina@example.com",
+      "phone": "0321-9988221",
+      "addressLine1": "Apartment 4, Clifton Block 4",
+      "city": "Karachi",
+      "country": "Pakistan"
+    },
+    "items": [
+      {
+        "productId": "prod-1",
+        "productName": "Double-Faced Cashmere Wool Coat",
+        "productImage": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1000&auto=format&fit=crop",
+        "size": "M",
+        "color": "Oatmeal Camel",
+        "sku": "COAT-DF-M-CAM",
+        "price": 48500,
+        "quantity": 1
+      }
+    ],
+    "market": "PK",
+    "currency": "PKR",
+    "subtotal": 48500,
+    "shippingCost": 0,
+    "discount": 0,
+    "total": 48500,
+    "paymentMethod": "COD",
+    "paymentStatus": "PENDING",
+    "orderStatus": "CONFIRMED",
+    "trackingNumber": "TRK-EXP-91280",
+    "courierName": "TCS Express",
+    "createdAt": "2026-03-27T14:15:00Z",
+    "updatedAt": "2026-03-27T14:15:00Z"
+  },
+  {
+    "id": "ord-3",
+    "orderNumber": "ORD-2026-982099",
+    "customer": {
+      "fullName": "Eleanor Vance",
+      "email": "eleanor@vance.co.uk",
+      "phone": "+44 20 7946 0912",
+      "addressLine1": "18 Kensington Gardens",
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    "items": [
+      {
+        "productId": "prod-4",
+        "productName": "18K Gold PVD Herringbone & Tennis Choker Set",
+        "productImage": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1000&auto=format&fit=crop",
+        "sku": "JWL-HRB-TNS-GLD",
+        "price": 60,
+        "quantity": 1
+      }
+    ],
+    "market": "INTL",
+    "currency": "USD",
+    "subtotal": 60,
+    "shippingCost": 35,
+    "discount": 0,
+    "total": 95,
+    "paymentMethod": "CARD",
+    "paymentStatus": "PAID",
+    "orderStatus": "DISPATCHED",
+    "trackingNumber": "TRK-DHL-448102",
+    "courierName": "DHL Express Priority",
+    "createdAt": "2026-03-26T09:20:00Z",
+    "updatedAt": "2026-03-26T09:20:00Z"
+  },
+  {
+    "id": "ord-4",
+    "orderNumber": "ORD-2026-982098",
+    "customer": {
+      "fullName": "Bilal Chaudhry",
+      "email": "bilal@chaudhry.pk",
+      "phone": "0333-5566778",
+      "addressLine1": "Sector F-8/3, Street 22",
+      "city": "Islamabad",
+      "country": "Pakistan"
+    },
+    "items": [
+      {
+        "productId": "prod-5",
+        "productName": "The Florentine Italian Calfskin Tote Bag",
+        "productImage": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1000&auto=format&fit=crop",
+        "sku": "ACC-TOT-FLR-TAN",
+        "price": 39500,
+        "quantity": 1
+      }
+    ],
+    "market": "PK",
+    "currency": "PKR",
+    "subtotal": 39500,
+    "shippingCost": 0,
+    "discount": 0,
+    "total": 39500,
+    "paymentMethod": "COD",
+    "paymentStatus": "PAID",
+    "orderStatus": "DELIVERED",
+    "trackingNumber": "TRK-EXP-91275",
+    "courierName": "Trax Logistics",
+    "createdAt": "2026-03-25T11:45:00Z",
+    "updatedAt": "2026-03-25T11:45:00Z"
+  }
+]

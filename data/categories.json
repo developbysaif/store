@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cat-clothing",
+    "name": "Clothing",
+    "slug": "clothing",
+    "description": "Impeccably tailored coats, pure silks, merino knits and timeless contemporary silhouettes.",
+    "image": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1200&auto=format&fit=crop",
+    "itemCount": 24,
+    "featured": true
+  },
+  {
+    "id": "cat-watches",
+    "name": "Watches",
+    "slug": "watches",
+    "description": "Precision chronographs, minimalist dress timepieces, and hand-finished couple editions.",
+    "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop",
+    "itemCount": 18,
+    "featured": true
+  },
+  {
+    "id": "cat-jewellery",
+    "name": "Artificial Jewellery",
+    "slug": "jewellery",
+    "description": "18K gold-plated vermeil, sparkling cubic zirconia pavé, and handcrafted ceremonial statement sets.",
+    "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=1200&auto=format&fit=crop",
+    "itemCount": 32,
+    "featured": true
+  },
+  {
+    "id": "cat-accessories",
+    "name": "Accessories",
+    "slug": "accessories",
+    "description": "Italian calfskin leather bags, burnished wallets, hand-rolled silk scarves and artisanal sunglasses.",
+    "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=1200&auto=format&fit=crop",
+    "itemCount": 20,
+    "featured": true
+  }
+]
