@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { storeConfig } from "@/lib/store-config";
 
 const CartContext = createContext(undefined);
@@ -12,24 +12,27 @@ const VALID_COUPONS = {
 };
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]);
-  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
-  const [coupon, setCoupon] = useState(null);
-
-  useEffect(() => {
+  const [items, setItems] = useState(() => {
+    if (typeof window === "undefined") return [];
     try {
       const saved = localStorage.getItem("store_cart");
-      if (saved) {
-        setItems(JSON.parse(saved));
-      }
-      const savedCoupon = localStorage.getItem("store_coupon");
-      if (savedCoupon) {
-        setCoupon(JSON.parse(savedCoupon));
-      }
-    } catch (e) {
-      console.error(e);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
     }
-  }, []);
+  });
+
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+
+  const [coupon, setCoupon] = useState(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const savedCoupon = localStorage.getItem("store_coupon");
+      return savedCoupon ? JSON.parse(savedCoupon) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const saveItems = (updated) => {
     setItems(updated);
@@ -71,12 +74,12 @@ export function CartProvider({ children }) {
     saveItems(updated);
   };
 
-  const updateQuantity = (cartItemId, quantity) => {
-    if (quantity <= 0) {
+  const updateQuantity = (cartItemId, newQuantity) => {
+    if (newQuantity <= 0) {
       removeFromCart(cartItemId);
       return;
     }
-    const updated = items.map((i) => (i.id === cartItemId ? { ...i, quantity } : i));
+    const updated = items.map((i) => (i.id === cartItemId ? { ...i, quantity: newQuantity } : i));
     saveItems(updated);
   };
 
@@ -89,16 +92,16 @@ export function CartProvider({ children }) {
   };
 
   const applyCoupon = (code) => {
-    const cleanCode = (code || "").trim().toUpperCase();
-    if (VALID_COUPONS[cleanCode]) {
-      const newCoupon = { code: cleanCode, discountPercent: VALID_COUPONS[cleanCode] };
-      setCoupon(newCoupon);
+    const upper = code.trim().toUpperCase();
+    if (VALID_COUPONS[upper]) {
+      const couponObj = { code: upper, discountPercent: VALID_COUPONS[upper] };
+      setCoupon(couponObj);
       if (typeof window !== "undefined") {
-        localStorage.setItem("store_coupon", JSON.stringify(newCoupon));
+        localStorage.setItem("store_coupon", JSON.stringify(couponObj));
       }
-      return { success: true, message: `Promo code ${cleanCode} applied (-${newCoupon.discountPercent}%)` };
+      return { success: true, message: `Privilege code applied: -${VALID_COUPONS[upper]}%` };
     }
-    return { success: false, message: "Invalid promo code. Try LUXURY10 or WELCOME15" };
+    return { success: false, message: "Invalid promotional code" };
   };
 
   const removeCoupon = () => {
@@ -112,18 +115,12 @@ export function CartProvider({ children }) {
   const subtotalPKR = items.reduce((acc, curr) => acc + curr.unitPricePKR * curr.quantity, 0);
   const subtotalUSD = items.reduce((acc, curr) => acc + curr.unitPriceUSD * curr.quantity, 0);
 
-  const hasFreeShippingPKR = subtotalPKR >= storeConfig.freeShippingThresholdPKR;
-  const hasFreeShippingUSD = subtotalUSD >= storeConfig.freeShippingThresholdUSD;
-
   const progressToFreeShippingPKR = Math.min(
     100,
     Math.round((subtotalPKR / storeConfig.freeShippingThresholdPKR) * 100)
   );
-
-  const amountNeededForFreeShippingPKR = Math.max(
-    0,
-    storeConfig.freeShippingThresholdPKR - subtotalPKR
-  );
+  const amountNeededForFreeShippingPKR = Math.max(0, storeConfig.freeShippingThresholdPKR - subtotalPKR);
+  const hasFreeShippingPKR = subtotalPKR >= storeConfig.freeShippingThresholdPKR;
 
   return (
     <CartContext.Provider
@@ -133,19 +130,17 @@ export function CartProvider({ children }) {
         removeFromCart,
         updateQuantity,
         clearCart,
-        isCartDrawerOpen,
-        openCartDrawer: () => setIsCartDrawerOpen(true),
-        closeCartDrawer: () => setIsCartDrawerOpen(false),
         itemsCount,
         subtotalPKR,
         subtotalUSD,
+        isCartDrawerOpen,
+        setIsCartDrawerOpen,
         coupon,
         applyCoupon,
         removeCoupon,
-        hasFreeShippingPKR,
-        hasFreeShippingUSD,
         progressToFreeShippingPKR,
         amountNeededForFreeShippingPKR,
+        hasFreeShippingPKR,
       }}
     >
       {children}

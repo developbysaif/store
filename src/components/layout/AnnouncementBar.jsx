@@ -18,24 +18,24 @@ export function AnnouncementBar() {
   }, []);
 
   return (
-    <div className="bg-[#171717] text-[#FAF8F5] text-xs py-2 px-4 border-b border-[#2A2A2A] relative z-40">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="bg-[#171717] text-[#FAF8F5] text-[11px] sm:text-xs py-2 px-3 sm:px-4 border-b border-[#2A2A2A] relative z-40">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
         {/* Market indicator */}
-        <div className="hidden sm:flex items-center gap-2 text-[#A1A1AA]">
+        <div className="hidden lg:flex items-center gap-2 text-[#A1A1AA] shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-[#B58A52] animate-pulse"></span>
-          <span>{isPakistanMarket ? "🇵🇰 Pakistan Domestic Store" : "🌍 International Priority Store"}</span>
+          <span className="truncate">{isPakistanMarket ? "🇵🇰 Pakistan Domestic Store" : "🌍 International Priority Store"}</span>
         </div>
 
         {/* Rotating message */}
-        <div className="flex-1 text-center font-medium tracking-wide flex items-center justify-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#B58A52] inline-block" />
-          <span className="transition-all duration-500 ease-in-out">
+        <div className="flex-1 text-center font-medium tracking-wide flex items-center justify-center gap-1.5 min-w-0">
+          <Sparkles className="w-3.5 h-3.5 text-[#B58A52] shrink-0 inline-block" />
+          <span className="transition-all duration-500 ease-in-out truncate">
             {storeConfig.announcementMessages[currentMsgIndex]}
           </span>
         </div>
 
         {/* Currency Switcher Dropdown */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="flex items-center gap-1.5 text-xs text-[#FAF8F5] hover:text-[#B58A52] transition-colors py-0.5 px-2 rounded border border-[#333333] hover:border-[#B58A52]"

@@ -7,22 +7,9 @@ import {
   Download,
   FileSpreadsheet,
   Search,
-  TrendingUp,
-  TrendingDown,
-  ShoppingBag,
   Package,
-  Layers,
-  DollarSign,
   ChevronRight,
-  MoreVertical,
-  CheckCircle2,
-  Clock,
   Truck,
-  PhoneCall,
-  ExternalLink,
-  Send,
-  AlertCircle,
-  XCircle,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
@@ -36,9 +23,8 @@ export default function AdminDashboardPage() {
   const [selectedCourier, setSelectedCourier] = useState("Leopard Courier");
   const [dispatchTrackingNum, setDispatchTrackingNum] = useState("");
 
-  const loadData = async () => {
+  const refreshData = async () => {
     try {
-      setLoading(true);
       const [statsRes, ordersRes, productsRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/orders"),
@@ -53,31 +39,37 @@ export default function AdminDashboardPage() {
       if (ordersData?.orders) setOrders(ordersData.orders);
       if (productsData?.products) setProducts(productsData.products);
     } catch (err) {
-      console.error("Error loading dashboard data:", err);
-    } finally {
-      setLoading(false);
+      console.error("Error refreshing dashboard data:", err);
     }
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  // Update order status directly
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    try {
-      const res = await fetch(`/api/orders/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderStatus: newStatus }),
+    let isMounted = true;
+    Promise.all([
+      fetch("/api/admin/stats"),
+      fetch("/api/orders"),
+      fetch("/api/products"),
+    ])
+      .then(async ([statsRes, ordersRes, productsRes]) => {
+        const statsData = await statsRes.json();
+        const ordersData = await ordersRes.json();
+        const productsData = await productsRes.json();
+        if (isMounted) {
+          if (statsData?.stats) setStats(statsData.stats);
+          if (ordersData?.orders) setOrders(ordersData.orders);
+          if (productsData?.products) setProducts(productsData.products);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading dashboard data:", err);
+        if (isMounted) setLoading(false);
       });
-      if (res.ok) {
-        loadData();
-      }
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Dispatch order with courier & tracking
   const handleDispatchOrder = async () => {
@@ -95,7 +87,7 @@ export default function AdminDashboardPage() {
       if (res.ok) {
         setDispatchModalOrder(null);
         setDispatchTrackingNum("");
-        loadData();
+        refreshData();
       }
     } catch (err) {
       console.error("Failed to dispatch order:", err);
@@ -144,38 +136,47 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-64">
             <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Search product, order, city..."
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="pl-9 pr-3 py-2 text-xs bg-white border border-[#E5E5E9] rounded-xl text-[#171717] focus:outline-none focus:border-[#171717] w-64 shadow-xs"
+              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#E5E5E9] rounded-xl text-[#171717] focus:outline-none focus:border-[#171717] shadow-xs"
             />
           </div>
 
-          <button
-            onClick={() => alert("CSV Export generated successfully for all orders and products.")}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#E5E5E9] rounded-xl text-[#171717] hover:bg-[#F4F4F6] transition-colors shadow-xs cursor-pointer"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5" />
-            <span>Export CSV</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => alert("CSV Export generated successfully for all orders and products.")}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-white border border-[#E5E5E9] rounded-xl text-[#171717] hover:bg-[#F4F4F6] transition-colors shadow-xs cursor-pointer min-h-[40px]"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Export CSV</span>
+            </button>
 
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-[#171717] text-white rounded-xl hover:bg-[#B58A52] transition-colors shadow-xs cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download Report</span>
-          </button>
+            <button
+              onClick={() => window.print()}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-semibold bg-[#171717] text-white rounded-xl hover:bg-[#B58A52] transition-colors shadow-xs cursor-pointer min-h-[40px]"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Report</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Metric Cards Row 1 (Matches User Reference Image Ecomora) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-3 bg-white p-6 rounded-2xl border border-[#E5E5E9] h-52 animate-pulse" />
+          <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-[#E5E5E9] h-52 animate-pulse" />
+          <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-[#E5E5E9] h-52 animate-pulse" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
         {/* Total Products Sales Card (3 cols) */}
         <div className="lg:col-span-3 bg-white p-6 rounded-2xl border border-[#E5E5E9] shadow-xs flex flex-col justify-between">
           <div className="space-y-1">
@@ -300,6 +301,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Row 2: Customer Order Status Breakdown (Fulfilling User's Exact Requirement) */}
       <div className="bg-white p-6 rounded-2xl border border-[#E5E5E9] shadow-xs">

@@ -22,6 +22,11 @@ export async function generateMetadata({ params }) {
 export default async function PolicyPage({ params }) {
   const { type } = await params;
 
+  const validTypes = ["shipping", "returns", "size-guide", "terms", "privacy"];
+  if (!validTypes.includes(type)) {
+    notFound();
+  }
+
   return (
     <div className="bg-[#FAF8F5] min-h-screen py-16 sm:py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">

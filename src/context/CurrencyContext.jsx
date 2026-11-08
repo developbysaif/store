@@ -1,23 +1,23 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { formatPrice, getRawPriceInCurrency } from "@/lib/currency";
 
 const CurrencyContext = createContext(undefined);
 
 export function CurrencyProvider({ children }) {
-  const [currency, setCurrencyState] = useState("PKR");
-
-  useEffect(() => {
+  const [currency, setCurrencyState] = useState(() => {
+    if (typeof window === "undefined") return "PKR";
     try {
       const saved = localStorage.getItem("store_currency");
       if (saved && ["PKR", "USD", "EUR", "GBP"].includes(saved)) {
-        setCurrencyState(saved);
+        return saved;
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // fallback
     }
-  }, []);
+    return "PKR";
+  });
 
   const setCurrency = (c) => {
     setCurrencyState(c);

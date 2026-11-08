@@ -1,23 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { PRODUCTS } from "@/lib/mock-data";
 
 const WishlistContext = createContext(undefined);
 
 export function WishlistProvider({ children }) {
-  const [wishlistIds, setWishlistIds] = useState([]);
-
-  useEffect(() => {
+  const [wishlistIds, setWishlistIds] = useState(() => {
+    if (typeof window === "undefined") return [];
     try {
       const saved = localStorage.getItem("store_wishlist");
-      if (saved) {
-        setWishlistIds(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.error(e);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
     }
-  }, []);
+  });
 
   const toggleWishlist = (productId) => {
     setWishlistIds((prev) => {

@@ -149,10 +149,10 @@ export default function CartPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="p-5 bg-white rounded-xl border border-[#E8E4DC] flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between shadow-xs"
+                className="p-4 sm:p-5 bg-white rounded-xl border border-[#E8E4DC] flex flex-col sm:flex-row gap-4 sm:gap-5 items-start sm:items-center justify-between shadow-xs"
               >
-                <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-24 rounded-lg bg-[#E8E4DC] overflow-hidden shrink-0">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-lg bg-[#E8E4DC] overflow-hidden shrink-0">
                     <Image
                       src={item.product.images[0]?.url || "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600"}
                       alt={item.product.name}
@@ -190,7 +190,8 @@ export default function CartPage() {
                   <div className="flex items-center border border-[#E8E4DC] rounded-lg bg-[#FAF8F5]">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-2.5 py-1.5 text-[#71717A] hover:text-[#171717]"
+                      aria-label={`Decrease quantity of ${item.product.name}`}
+                      className="px-2.5 py-1.5 text-[#71717A] hover:text-[#171717] cursor-pointer"
                     >
                       <Minus className="w-3.5 h-3.5" />
                     </button>
@@ -199,7 +200,8 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2.5 py-1.5 text-[#71717A] hover:text-[#171717]"
+                      aria-label={`Increase quantity of ${item.product.name}`}
+                      className="px-2.5 py-1.5 text-[#71717A] hover:text-[#171717] cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
@@ -221,6 +223,7 @@ export default function CartPage() {
                   {/* Delete */}
                   <button
                     onClick={() => removeFromCart(item.id)}
+                    aria-label={`Remove ${item.product.name} from bag`}
                     className="text-[#A1A1AA] hover:text-red-600 p-1 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />

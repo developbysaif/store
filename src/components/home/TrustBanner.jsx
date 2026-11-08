@@ -29,20 +29,20 @@ export function TrustBanner() {
   ];
 
   return (
-    <section className="bg-[#FAF8F5] border-t border-[#E8E4DC] py-14 sm:py-16">
+    <section className="bg-[#FAF8F5] border-t border-[#E8E4DC] py-10 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
-              <div key={idx} className="flex flex-col items-center text-center space-y-2.5">
-                <div className="w-12 h-12 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center text-[#B58A52] shadow-xs">
-                  <Icon className="w-5 h-5 stroke-[1.4]" />
+              <div key={idx} className="flex flex-col items-center text-center space-y-2">
+                <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center text-[#B58A52] shadow-xs">
+                  <Icon className="w-4 sm:w-5 h-4 sm:h-5 stroke-[1.4]" />
                 </div>
-                <h4 className="text-xs uppercase tracking-widest font-semibold text-[#171717]">
+                <h4 className="text-[11px] sm:text-xs uppercase tracking-wider sm:tracking-widest font-semibold text-[#171717]">
                   {pillar.title}
                 </h4>
-                <p className="text-xs text-[#71717A] max-w-xs leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-[#71717A] max-w-xs leading-relaxed hidden sm:block">
                   {pillar.desc}
                 </p>
               </div>

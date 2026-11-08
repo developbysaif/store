@@ -2,22 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   PhoneCall,
   CheckCircle2,
   Truck,
   Printer,
   Search,
-  ExternalLink,
   MessageCircle,
-  Clock,
-  Filter,
   Trash2,
-  Send,
-  AlertCircle,
-  XCircle,
-  Building,
 } from "lucide-react";
 
 export default function AdminOrdersPage() {
@@ -31,23 +23,38 @@ export default function AdminOrdersPage() {
   const [selectedCourier, setSelectedCourier] = useState("Leopard Courier Express");
   const [trackingAWB, setTrackingAWB] = useState("");
 
-  const loadOrders = async () => {
+  const refreshOrders = async () => {
     try {
-      setLoading(true);
       const res = await fetch("/api/orders");
       const data = await res.json();
       if (data && data.orders) {
         setOrders(data.orders);
       }
     } catch (err) {
-      console.error("Failed to load orders:", err);
-    } finally {
-      setLoading(false);
+      console.error("Failed to refresh orders:", err);
     }
   };
 
   useEffect(() => {
-    loadOrders();
+    let isMounted = true;
+    fetch("/api/orders")
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted) {
+          if (data && data.orders) {
+            setOrders(data.orders);
+          }
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load orders:", err);
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleUpdateStatus = async (orderId, status) => {
@@ -58,7 +65,7 @@ export default function AdminOrdersPage() {
         body: JSON.stringify({ orderStatus: status }),
       });
       if (res.ok) {
-        loadOrders();
+        refreshOrders();
       }
     } catch (err) {
       console.error("Failed to update status:", err);
@@ -86,7 +93,7 @@ export default function AdminOrdersPage() {
       if (res.ok) {
         setDispatchModalOrder(null);
         setTrackingAWB("");
-        loadOrders();
+        refreshOrders();
       }
     } catch (err) {
       console.error("Failed to dispatch order:", err);
@@ -97,7 +104,7 @@ export default function AdminOrdersPage() {
     if (!confirm(`Are you sure you want to delete order ${orderNum}?`)) return;
     try {
       const res = await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
-      if (res.ok) loadOrders();
+      if (res.ok) refreshOrders();
     } catch (err) {
       console.error("Failed to delete order:", err);
     }
@@ -229,21 +236,27 @@ export default function AdminOrdersPage() {
           Showing <strong>{filtered.length}</strong> consignments
         </div>
 
-        <div className="relative">
+        <div className="relative w-full sm:w-72">
           <Search className="w-4 h-4 text-[#A1A1AA] absolute left-3 top-2.5" />
           <input
             type="text"
             placeholder="Search order#, phone, patron, city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-3 py-2 text-xs bg-[#FAF8F5] border border-[#E5E5E9] rounded-xl text-[#171717] focus:outline-none focus:border-[#171717] w-72"
+            className="w-full pl-9 pr-3 py-2 text-xs bg-[#FAF8F5] border border-[#E5E5E9] rounded-xl text-[#171717] focus:outline-none focus:border-[#171717]"
           />
         </div>
       </div>
 
       {/* Orders List */}
       <div className="space-y-4">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="bg-white rounded-2xl border border-[#E5E5E9] p-6 h-36 animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="bg-white p-12 text-center rounded-2xl border border-[#E5E5E9] text-[#71717A] text-xs">
             No orders found matching this filter criteria.
           </div>

@@ -4,14 +4,11 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Layers,
   Plus,
   Search,
   Edit2,
   Trash2,
   ExternalLink,
-  Sparkles,
-  Package,
 } from "lucide-react";
 
 export default function AdminCategoriesPage() {
@@ -32,9 +29,8 @@ export default function AdminCategoriesPage() {
   const [formHeroTitle, setFormHeroTitle] = useState("");
   const [formHeroSubtitle, setFormHeroSubtitle] = useState("");
 
-  const loadData = async () => {
+  const refreshData = async () => {
     try {
-      setLoading(true);
       const [catRes, prodRes] = await Promise.all([
         fetch("/api/categories"),
         fetch("/api/products"),
@@ -46,13 +42,29 @@ export default function AdminCategoriesPage() {
       if (prodData?.products) setProducts(prodData.products);
     } catch (err) {
       console.error("Failed to load categories:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+    Promise.all([fetch("/api/categories"), fetch("/api/products")])
+      .then(async ([catRes, prodRes]) => {
+        const catData = await catRes.json();
+        const prodData = await prodRes.json();
+        if (isMounted) {
+          if (catData?.categories) setCategories(catData.categories);
+          if (prodData?.products) setProducts(prodData.products);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load categories:", err);
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const openAddModal = () => {
@@ -86,7 +98,7 @@ export default function AdminCategoriesPage() {
         method: "DELETE",
       });
       if (res.ok) {
-        loadData();
+        refreshData();
       }
     } catch (err) {
       console.error("Failed to delete category:", err);
@@ -124,7 +136,7 @@ export default function AdminCategoriesPage() {
       }
       setIsAddModalOpen(false);
       setEditingCategory(null);
-      loadData();
+      refreshData();
     } catch (err) {
       console.error("Error saving category:", err);
     }
@@ -179,8 +191,21 @@ export default function AdminCategoriesPage() {
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredCategories.map((cat) => {
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="bg-white rounded-2xl border border-[#E5E5E9] p-6 h-64 animate-pulse flex flex-col justify-between">
+              <div className="w-full h-32 bg-[#FAF8F5] rounded-xl" />
+              <div className="space-y-2">
+                <div className="w-2/3 h-4 bg-[#FAF8F5] rounded" />
+                <div className="w-1/2 h-3 bg-[#FAF8F5] rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredCategories.map((cat) => {
           const productCount = products.filter((p) => p.category === cat.slug).length;
 
           return (
@@ -249,6 +274,7 @@ export default function AdminCategoriesPage() {
           );
         })}
       </div>
+      )}
 
       {/* Add / Edit Category Modal */}
       {isAddModalOpen && (

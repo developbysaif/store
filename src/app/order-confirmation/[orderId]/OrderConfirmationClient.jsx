@@ -3,56 +3,52 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { storeConfig } from "@/lib/store-config";
-import {
-  CheckCircle2,
-  Printer,
-  Package,
-  Truck,
-  ArrowRight,
-  Phone,
-  MessageCircle,
-  Clock,
-  MapPin,
-} from "lucide-react";
+import { CheckCircle2, ArrowRight, Clock } from "lucide-react";
 
 export function OrderConfirmationClient({ orderNumber }) {
-  const [order, setOrder] = useState(null);
-
-  useEffect(() => {
-    // 1. Try local storage first
+  const [order, setOrder] = useState(() => {
+    if (typeof window === "undefined") return null;
     try {
       const saved = localStorage.getItem("last_completed_order");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.orderNumber === orderNumber) {
-          setOrder(parsed);
-          return;
+          return parsed;
         }
       }
       const allOrders = localStorage.getItem("store_orders");
       if (allOrders) {
         const parsedAll = JSON.parse(allOrders);
         const found = parsedAll.find((o) => o.orderNumber === orderNumber);
-        if (found) {
-          setOrder(found);
-          return;
-        }
+        if (found) return found;
       }
-    } catch (e) {
-      console.error(e);
+    } catch {
+      // fallback
     }
+    return null;
+  });
 
-    // 2. Fallback to API query
-    fetch(`/api/orders?search=${orderNumber}`)
+  useEffect(() => {
+    if (order) return;
+    let isCancelled = false;
+
+    fetch("/api/orders/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderNumber, contact: orderNumber }),
+    })
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.orders && data.orders.length > 0) {
-          setOrder(data.orders[0]);
+        if (!isCancelled && data && data.success && data.order) {
+          setOrder(data.order);
         }
       })
       .catch((err) => console.error("Error loading order:", err));
-  }, [orderNumber]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [orderNumber, order]);
 
   return (
     <div className="bg-[#FAF8F5] min-h-screen py-12 sm:py-20">

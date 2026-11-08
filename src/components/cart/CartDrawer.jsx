@@ -64,7 +64,7 @@ export function CartDrawer() {
         onClick={closeCartDrawer}
       />
 
-      <div className="relative w-full max-w-md bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between z-10 border-l border-[#E8E4DC] animate-in slide-in-from-right duration-300">
+      <div className="relative w-full max-w-[92vw] sm:max-w-md bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between z-10 border-l border-[#E8E4DC] animate-in slide-in-from-right duration-300">
         <div className="p-5 sm:p-6 border-b border-[#E8E4DC] bg-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -146,9 +146,9 @@ export function CartDrawer() {
             items.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 p-3 bg-white rounded-lg border border-[#E8E4DC] relative group"
+                className="flex gap-3 p-3 bg-white rounded-lg border border-[#E8E4DC] relative group"
               >
-                <div className="relative w-20 h-24 rounded bg-[#E8E4DC] overflow-hidden shrink-0">
+                <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded bg-[#E8E4DC] overflow-hidden shrink-0">
                   <Image
                     src={item.product.images[0].url}
                     alt={item.product.name}
@@ -222,7 +222,7 @@ export function CartDrawer() {
         </div>
 
         {items.length > 0 && (
-          <div className="p-5 sm:p-6 border-t border-[#E8E4DC] bg-white space-y-3">
+          <div className="p-4 sm:p-6 border-t border-[#E8E4DC] bg-white space-y-3 pb-safe">
             <div>
               {coupon ? (
                 <div className="flex items-center justify-between text-xs bg-[#F7F3EB] border border-[#B58A52]/30 px-3 py-2 rounded text-[#171717]">

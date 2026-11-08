@@ -25,6 +25,7 @@ export function ProductHero3D({
   const { isInWishlist, toggleWishlist } = useWishlist();
 
   const containerRef = useRef(null);
+  const touchStartX = useRef(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [isAutoSpinning, setIsAutoSpinning] = useState(false);
@@ -33,6 +34,26 @@ export function ProductHero3D({
   const [activeImageIdx, setActiveImageIdx] = useState(0);
 
   const isFavorited = isInWishlist(product.id);
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    const imagesCount = product.images?.length || 0;
+    if (imagesCount > 1 && Math.abs(diff) > 40) {
+      if (diff > 0) {
+        // Swiped left -> next
+        setActiveImageIdx((prev) => (prev + 1) % imagesCount);
+      } else {
+        // Swiped right -> prev
+        setActiveImageIdx((prev) => (prev - 1 + imagesCount) % imagesCount);
+      }
+    }
+    touchStartX.current = null;
+  };
 
   const getThemeColors = () => {
     const colorLower = (selectedVariant?.color || "").toLowerCase();
@@ -153,7 +174,7 @@ export function ProductHero3D({
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full overflow-hidden bg-gradient-to-b ${theme.bg} transition-colors duration-700 py-12 sm:py-16 px-4 sm:px-8 border-b border-[#E8E4DC] select-none`}
+      className={`relative w-full overflow-hidden bg-gradient-to-b ${theme.bg} transition-colors duration-700 py-8 sm:py-16 px-4 sm:px-8 border-b border-[#E8E4DC] select-none`}
       style={{ perspective: "1200px" }}
     >
       <div
@@ -163,19 +184,19 @@ export function ProductHero3D({
 
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute top-[18%] left-[12%] w-10 h-10 rounded-full border border-white/40 bg-white/20 backdrop-blur-md shadow-lg animate-float"
+          className="hidden sm:flex absolute top-[18%] left-[12%] w-10 h-10 rounded-full border border-white/40 bg-white/20 backdrop-blur-md shadow-lg animate-float items-center justify-center"
           style={{
             transform: `translate3d(${rotateY * -0.8}px, ${rotateX * -0.8}px, 40px)`,
             transition: "transform 0.1s ease-out",
           }}
         >
-          <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-[#B58A52]">
+          <div className="text-[10px] font-bold text-[#B58A52]">
             ✦
           </div>
         </div>
 
         <div
-          className="absolute top-[22%] right-[14%] px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#E8E4DC] shadow-xl text-xs font-bold text-[#171717] flex items-center gap-1.5 animate-float"
+          className="hidden sm:flex absolute top-[22%] right-[14%] px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#E8E4DC] shadow-xl text-xs font-bold text-[#171717] items-center gap-1.5 animate-float"
           style={{
             transform: `translate3d(${rotateY * 0.9}px, ${rotateX * 0.9}px, 60px)`,
             transition: "transform 0.1s ease-out",
@@ -187,7 +208,7 @@ export function ProductHero3D({
         </div>
 
         <div
-          className="absolute bottom-[28%] left-[10%] px-3 py-1.5 rounded-full bg-[#171717] text-[#FAF8F5] shadow-xl text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 animate-float"
+          className="hidden sm:flex absolute bottom-[28%] left-[10%] px-3 py-1.5 rounded-full bg-[#171717] text-[#FAF8F5] shadow-xl text-[11px] font-bold uppercase tracking-wider items-center gap-1.5 animate-float"
           style={{
             transform: `translate3d(${rotateY * -0.6}px, ${rotateX * -0.6}px, 50px)`,
             transition: "transform 0.1s ease-out",
@@ -199,7 +220,7 @@ export function ProductHero3D({
         </div>
 
         <div
-          className="absolute bottom-[22%] right-[12%] w-12 h-12 rounded-full bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-xs text-[#B58A52] font-serif shadow-lg animate-float"
+          className="hidden sm:flex absolute bottom-[22%] right-[12%] w-12 h-12 rounded-full bg-white/30 backdrop-blur-md border border-white/40 items-center justify-center text-xs text-[#B58A52] font-serif shadow-lg animate-float"
           style={{
             transform: `translate3d(${rotateY * 0.7}px, ${rotateX * 0.7}px, 35px)`,
             transition: "transform 0.1s ease-out",
@@ -312,7 +333,9 @@ export function ProductHero3D({
 
         <div className="lg:col-span-5 flex flex-col items-center justify-center order-1 lg:order-2">
           <div
-            className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[3/4] flex items-center justify-center transition-transform duration-200 ease-out"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className="relative w-full max-w-[280px] sm:max-w-[360px] lg:max-w-[420px] aspect-[3/4] flex items-center justify-center transition-transform duration-200 ease-out touch-pan-y"
             style={{
               transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
               transformStyle: "preserve-3d",

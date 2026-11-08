@@ -1,17 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Search,
-  Package,
   Truck,
   CheckCircle,
-  Clock,
-  MapPin,
-  Phone,
-  MessageCircle,
   AlertCircle,
 } from "lucide-react";
 
@@ -25,13 +19,7 @@ export function OrderTrackingClient() {
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (initialOrder) {
-      handleSearch(initialOrder);
-    }
-  }, [initialOrder]);
-
-  const handleSearch = async (ordNum) => {
+  const performSearch = useCallback(async (ordNum) => {
     const targetOrder = (ordNum || orderQuery).trim().toUpperCase();
     if (!targetOrder && !contactQuery) return;
 
@@ -40,30 +28,38 @@ export function OrderTrackingClient() {
 
     try {
       // 1. Check local storage
-      const stored = localStorage.getItem("store_orders");
-      if (stored) {
-        const orders = JSON.parse(stored);
-        const match = orders.find(
-          (o) =>
-            o.orderNumber.toUpperCase() === targetOrder ||
-            (contactQuery &&
-              (o.customer?.phone?.includes(contactQuery) ||
-                o.customer?.email?.toLowerCase() === contactQuery.toLowerCase()))
-        );
-        if (match) {
-          setFoundOrder(match);
-          setLoading(false);
-          return;
+      if (typeof window !== "undefined") {
+        const stored = localStorage.getItem("store_orders");
+        if (stored) {
+          const orders = JSON.parse(stored);
+          const match = orders.find(
+            (o) =>
+              o.orderNumber.toUpperCase() === targetOrder ||
+              (contactQuery &&
+                (o.customer?.phone?.includes(contactQuery) ||
+                  o.customer?.email?.toLowerCase() === contactQuery.toLowerCase()))
+          );
+          if (match) {
+            setFoundOrder(match);
+            setLoading(false);
+            return;
+          }
         }
       }
 
-      // 2. Fetch from backend /api/orders
-      const queryParam = targetOrder || contactQuery;
-      const res = await fetch(`/api/orders?search=${encodeURIComponent(queryParam)}`);
+      // 2. Fetch from secure backend verification endpoint /api/orders/track
+      const res = await fetch("/api/orders/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderNumber: targetOrder,
+          contact: contactQuery || targetOrder,
+        }),
+      });
       const data = await res.json();
 
-      if (data && data.orders && data.orders.length > 0) {
-        setFoundOrder(data.orders[0]);
+      if (res.ok && data && data.success && data.order) {
+        setFoundOrder(data.order);
         setLoading(false);
         return;
       }
@@ -119,7 +115,16 @@ export function OrderTrackingClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderQuery, contactQuery]);
+
+  useEffect(() => {
+    if (initialOrder) {
+      const timer = setTimeout(() => {
+        performSearch(initialOrder);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [initialOrder, performSearch]);
 
   const getStepProgress = (status) => {
     switch (status) {
@@ -169,7 +174,7 @@ export function OrderTrackingClient() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSearch();
+              performSearch();
             }}
             className="grid grid-cols-1 sm:grid-cols-12 gap-3"
           >
@@ -203,7 +208,7 @@ export function OrderTrackingClient() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-[#171717] hover:bg-[#B58A52] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full py-2.5 bg-[#171717] hover:bg-[#B58A52] text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 <Search className="w-3.5 h-3.5" />
                 <span>Track</span>
@@ -250,10 +255,10 @@ export function OrderTrackingClient() {
                   const isDone = idx <= currentStep;
                   const isCurrent = idx === currentStep;
                   return (
-                    <div key={idx} className="flex flex-col items-start space-y-2">
-                      <div className="flex items-center w-full">
+                    <div key={idx} className="flex sm:flex-col items-start gap-3 sm:gap-2">
+                      <div className="flex items-center w-auto sm:w-full shrink-0">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
                             isDone
                               ? "bg-[#10B981] text-white"
                               : isCurrent
@@ -271,7 +276,7 @@ export function OrderTrackingClient() {
                           />
                         )}
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="text-xs font-semibold text-[#171717]">{st.label}</div>
                         <div className="text-[11px] text-[#71717A]">{st.desc}</div>
                       </div>

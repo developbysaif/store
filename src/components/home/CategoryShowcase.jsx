@@ -30,56 +30,56 @@ export function CategoryShowcase() {
           </Link>
         </div>
 
-        {/* Categories Grid with 3D Elevation & Shine Sweep */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        {/* Categories Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
           {CATEGORIES.map((category) => (
             <Link
               key={category.id}
               href={`/category/${category.slug}`}
-              className="group relative block aspect-[3/4] overflow-hidden rounded-2xl bg-[#E8E4DC] shadow-md hover:shadow-2xl transition-all duration-700 ease-out hover:-translate-y-3 shine-sweep perspective-1000 border border-[#E8E4DC] hover:border-[#B58A52]/60"
+              className="group relative block aspect-[3/4] overflow-hidden rounded-xl sm:rounded-2xl bg-[#E8E4DC] shadow-md hover:shadow-2xl transition-all duration-500 ease-out sm:hover:-translate-y-2.5 shine-sweep border border-[#E8E4DC] hover:border-[#B58A52]/60"
             >
               {/* Background Photography with Zoom Effect */}
               <Image
                 src={category.image}
                 alt={category.name}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover transition-transform duration-1000 ease-out group-hover:scale-115 group-hover:rotate-1"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover transition-transform duration-700 ease-out sm:group-hover:scale-110"
               />
 
               {/* Gradient Scrim */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#171717]/90 via-[#171717]/35 to-transparent transition-opacity duration-500 group-hover:opacity-95" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#171717]/90 via-[#171717]/35 to-transparent transition-opacity duration-300 sm:group-hover:opacity-95" />
 
               {/* Top Category Badge */}
-              <div className="absolute top-4 left-4 z-10">
-                <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] uppercase font-bold tracking-widest text-[#FAF8F5] border border-white/20">
+              <div className="absolute top-2.5 sm:top-4 left-2.5 sm:left-4 z-10">
+                <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/20 backdrop-blur-md text-[9px] sm:text-[10px] uppercase font-bold tracking-wider sm:tracking-widest text-[#FAF8F5] border border-white/20">
                   {category.itemCount} Designs
                 </span>
               </div>
 
               {/* Text Overlay & Interactive Arrow */}
-              <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end text-[#FAF8F5] z-10">
-                <div className="flex items-end justify-between gap-2">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-widest text-[#D4AF37] font-bold block mb-1">
+              <div className="absolute inset-x-0 bottom-0 p-3 sm:p-6 flex flex-col justify-end text-[#FAF8F5] z-10">
+                <div className="flex items-end justify-between gap-1 sm:gap-2">
+                  <div className="min-w-0">
+                    <span className="text-[8px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest text-[#D4AF37] font-bold block mb-0.5 sm:mb-1 truncate">
                       Atelier Vertical
                     </span>
-                    <h3 className="font-serif text-2xl font-normal text-[#FAF8F5] group-hover:translate-x-1.5 transition-transform duration-300">
+                    <h3 className="font-serif text-sm sm:text-2xl font-normal text-[#FAF8F5] sm:group-hover:translate-x-1.5 transition-transform duration-300 truncate">
                       {category.name}
                     </h3>
                   </div>
 
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-[#B58A52] group-hover:scale-115 group-hover:rotate-45 transition-all duration-300 shrink-0 shadow-lg">
-                    <ArrowUpRight className="w-5 h-5" />
+                  <div className="w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white sm:group-hover:bg-[#B58A52] sm:group-hover:scale-110 sm:group-hover:rotate-45 transition-all duration-300 shrink-0 shadow-md">
+                    <ArrowUpRight className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                   </div>
                 </div>
 
-                <p className="text-xs text-[#E5E0D8] line-clamp-2 mt-2 font-light opacity-90 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-[#E5E0D8] line-clamp-1 sm:line-clamp-2 mt-1 sm:mt-2 font-light opacity-90 leading-relaxed hidden sm:block">
                   {category.description}
                 </p>
 
                 {/* Animated Bottom Border Indicator */}
-                <div className="mt-4 w-0 group-hover:w-full h-[2px] bg-[#B58A52] transition-all duration-500 rounded-full" />
+                <div className="mt-2 sm:mt-4 w-0 group-hover:w-full h-[2px] bg-[#B58A52] transition-all duration-500 rounded-full" />
               </div>
             </Link>
           ))}

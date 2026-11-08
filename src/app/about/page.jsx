@@ -6,7 +6,18 @@ import { Sparkles, ArrowRight, ShieldCheck, HeartHandshake, Award } from "lucide
 
 export const metadata = {
   title: `About Us — ${storeConfig.brandName} Atelier & Heritage`,
-  description: "The story behind our modern luxury fashion and lifestyle house.",
+  description:
+    "The story behind our modern luxury fashion house. Dedicated to fabric purity, precision horology, anti-tarnish 18K jewellery, and full-grain Italian leather.",
+  alternates: {
+    canonical: `${storeConfig.siteUrl}/about`,
+  },
+  openGraph: {
+    title: `About Us — ${storeConfig.brandName} Atelier & Heritage`,
+    description:
+      "The story behind our modern luxury fashion house. Dedicated to fabric purity, precision horology, anti-tarnish 18K jewellery, and full-grain Italian leather.",
+    url: `${storeConfig.siteUrl}/about`,
+    siteName: storeConfig.brandName,
+  },
 };
 
 export default function AboutPage() {

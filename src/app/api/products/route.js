@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProducts, createProduct } from "@/lib/db";
+import { requireAdminAuth } from "@/lib/security/auth";
+import { productMutationSchema } from "@/lib/security/validation";
 
 export async function GET(request) {
   try {
@@ -45,17 +47,37 @@ export async function GET(request) {
   }
 }
 
+/**
+ * POST /api/products — Create Catalog Product
+ * STRICT SECURITY: Restricted to authenticated administrators with strict Zod validation.
+ */
 export async function POST(request) {
   try {
-    const body = await request.json();
-    if (!body.name || !body.category) {
+    const adminSession = await requireAdminAuth(request);
+    if (!adminSession) {
       return NextResponse.json(
-        { success: false, error: "Product name and category are required" },
+        {
+          success: false,
+          error: "Unauthorized: Administrative session required to create catalog products.",
+        },
+        { status: 401 }
+      );
+    }
+
+    const rawBody = await request.json();
+    const parsed = productMutationSchema.safeParse(rawBody);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: parsed.error.issues[0]?.message || "Invalid product data",
+        },
         { status: 400 }
       );
     }
 
-    const created = createProduct(body);
+    const created = createProduct(parsed.data);
     return NextResponse.json({ success: true, product: created, data: created }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

@@ -16,7 +16,6 @@ import {
   X,
   ShieldCheck,
   ChevronDown,
-  Sparkles,
   ArrowRight,
   Globe,
 } from "lucide-react";
@@ -26,11 +25,12 @@ export function Navbar() {
   const pathname = usePathname();
   const { itemsCount, openCartDrawer } = useCart();
   const { wishlistCount } = useWishlist();
-  const { currency } = useCurrency();
+  const { currency, setCurrency } = useCurrency();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [expandedMobileCategory, setExpandedMobileCategory] = useState(null);
 
   const departments = [
     {
@@ -97,6 +97,7 @@ export function Navbar() {
 
               <button
                 onClick={() => setSearchOpen(true)}
+                aria-label="Open search dialog"
                 className="hidden lg:flex items-center gap-3 px-3.5 py-2 rounded-full bg-white/80 border border-[#E8E4DC] hover:border-[#B58A52] text-[#71717A] hover:text-[#171717] transition-all shadow-xs group w-64"
               >
                 <Search className="w-4 h-4 text-[#B58A52] group-hover:scale-110 transition-transform" />
@@ -108,15 +109,15 @@ export function Navbar() {
             </div>
 
             {/* Center: Brand Identity */}
-            <div className="text-center px-4">
+            <div className="text-center px-2 sm:px-4 min-w-0">
               <Link href="/" className="inline-block group py-1">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="font-serif text-2xl sm:text-3xl lg:text-4xl tracking-[0.22em] font-normal text-[#171717] group-hover:text-[#B58A52] transition-colors duration-300">
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                  <span className="font-serif text-lg sm:text-2xl md:text-3xl lg:text-4xl tracking-[0.14em] sm:tracking-[0.22em] font-normal text-[#171717] group-hover:text-[#B58A52] transition-colors duration-300 whitespace-nowrap">
                     {storeConfig.brandName}
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#B58A52] group-hover:scale-125 transition-transform" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#B58A52] group-hover:scale-125 transition-transform shrink-0" />
                 </div>
-                <div className="text-[9px] uppercase tracking-[0.35em] text-[#71717A] group-hover:text-[#171717] transition-colors font-medium mt-0.5">
+                <div className="text-[8px] sm:text-[9px] uppercase tracking-[0.2em] sm:tracking-[0.35em] text-[#71717A] group-hover:text-[#171717] transition-colors font-medium mt-0.5 truncate max-w-[220px] sm:max-w-none">
                   Haute Couture & Lifestyle Atelier
                 </div>
               </Link>
@@ -139,6 +140,7 @@ export function Navbar() {
 
               <Link
                 href="/wishlist"
+                aria-label="View saved pieces in wishlist"
                 className="p-2 text-[#171717] hover:text-[#B58A52] transition-colors relative group"
                 title="Wishlist"
               >
@@ -283,11 +285,12 @@ export function Navbar() {
             className="fixed inset-0 bg-[#171717]/65 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative w-full max-w-xs bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between py-6 px-6 z-50 overflow-y-auto">
+          <div className="relative w-[85%] max-w-sm bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between py-6 px-5 sm:px-6 z-50 overflow-y-auto pb-safe">
             <div>
-              <div className="flex items-center justify-between pb-6 border-b border-[#E8E4DC]">
+              {/* Drawer Top Header */}
+              <div className="flex items-center justify-between pb-5 border-b border-[#E8E4DC]">
                 <div>
-                  <span className="font-serif text-xl font-bold tracking-wider block">
+                  <span className="font-serif text-xl font-bold tracking-wider text-[#171717] block">
                     {storeConfig.brandName}
                   </span>
                   <span className="text-[9px] uppercase tracking-widest text-[#71717A]">
@@ -296,55 +299,156 @@ export function Navbar() {
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1.5 text-[#71717A] hover:text-[#171717] rounded-full hover:bg-white transition-colors"
-                  aria-label="Close menu"
+                  className="p-2 text-[#71717A] hover:text-[#171717] rounded-full hover:bg-white transition-colors cursor-pointer"
+                  aria-label="Close navigation menu"
                 >
                   <X className="w-5 h-5 stroke-[1.5]" />
                 </button>
               </div>
 
-              <div className="py-6 space-y-3">
-                <div className="text-[10px] uppercase font-bold tracking-widest text-[#B58A52]">
+              {/* Mobile Quick Search Button */}
+              <div className="pt-4 pb-2">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setSearchOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white border border-[#E8E4DC] text-[#71717A] text-xs shadow-xs"
+                >
+                  <Search className="w-4 h-4 text-[#B58A52]" />
+                  <span>Search clothing, watches, jewellery...</span>
+                </button>
+              </div>
+
+              {/* Expandable Navigation Categories */}
+              <div className="py-4 space-y-1">
+                <div className="text-[10px] uppercase font-bold tracking-widest text-[#B58A52] pb-2">
                   Explore Collections
                 </div>
-                {departments.map((dept) => (
-                  <Link
-                    key={dept.label}
-                    href={dept.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between text-sm font-semibold text-[#171717] hover:text-[#B58A52] py-2 border-b border-[#F0ECE3]"
-                  >
-                    <span className="flex items-center gap-2">
-                      {dept.label}
-                      {dept.isNewBadge && (
-                        <span className="text-[9px] bg-[#B58A52] text-white px-1.5 py-0.2 rounded font-bold">
-                          NEW
-                        </span>
+
+                {departments.map((dept) => {
+                  const hasSub = Array.isArray(dept.subcategories) && dept.subcategories.length > 0;
+                  const isExpanded = expandedMobileCategory === dept.label;
+
+                  return (
+                    <div key={dept.label} className="border-b border-[#F0ECE3]">
+                      <div className="flex items-center justify-between min-h-[44px]">
+                        <Link
+                          href={dept.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-2 text-sm font-semibold text-[#171717] hover:text-[#B58A52] py-2 flex-1"
+                        >
+                          <span>{dept.label}</span>
+                          {dept.isNewBadge && (
+                            <span className="text-[9px] bg-[#B58A52] text-white px-1.5 py-0.2 rounded font-bold">
+                              NEW
+                            </span>
+                          )}
+                        </Link>
+
+                        {hasSub ? (
+                          <button
+                            onClick={() =>
+                              setExpandedMobileCategory(isExpanded ? null : dept.label)
+                            }
+                            aria-label={`Toggle ${dept.label} subcategories`}
+                            className="p-2 text-[#71717A] hover:text-[#B58A52] transition-transform cursor-pointer"
+                          >
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? "rotate-180 text-[#B58A52]" : ""
+                              }`}
+                            />
+                          </button>
+                        ) : (
+                          <Link
+                            href={dept.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="p-2 text-[#A1A1AA]"
+                          >
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        )}
+                      </div>
+
+                      {/* Expandable Subcategories Accordion */}
+                      {hasSub && isExpanded && (
+                        <div className="pl-4 pb-3 pt-1 space-y-2 bg-[#F5F2EB]/50 rounded-xl mb-2 text-xs">
+                          {dept.subcategories.map((sub, sIdx) => (
+                            <Link
+                              key={sIdx}
+                              href={`/shop?search=${encodeURIComponent(sub)}`}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block py-1.5 text-[#52525B] hover:text-[#B58A52] font-medium"
+                            >
+                              • {sub}
+                            </Link>
+                          ))}
+                          <Link
+                            href={dept.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="block pt-1 text-[11px] font-bold text-[#B58A52] uppercase tracking-wider"
+                          >
+                            View Entire {dept.label} Collection →
+                          </Link>
+                        </div>
                       )}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#A1A1AA]" />
-                  </Link>
-                ))}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="pt-6 border-t border-[#E8E4DC] space-y-3">
-              <Link
-                href="/order-tracking"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block text-xs uppercase tracking-wider text-[#71717A] hover:text-[#171717]"
-              >
-                Track Your Consignment
-              </Link>
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#B58A52] font-semibold"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Admin & Store Analytics</span>
-              </Link>
-              <p className="text-[11px] text-[#A1A1AA]">
+            {/* Mobile Drawer Footer with Currency Switcher & Links */}
+            <div className="pt-5 border-t border-[#E8E4DC] space-y-4">
+              {/* Currency Selector */}
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[#71717A] block mb-2">
+                  Market / Currency
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <button
+                    onClick={() => setCurrency("PKR")}
+                    className={`py-2 px-3 rounded-lg font-semibold border transition-all ${
+                      currency === "PKR"
+                        ? "bg-[#171717] text-white border-[#171717]"
+                        : "bg-white text-[#71717A] border-[#E8E4DC]"
+                    }`}
+                  >
+                    🇵🇰 PKR (₨ COD)
+                  </button>
+                  <button
+                    onClick={() => setCurrency("USD")}
+                    className={`py-2 px-3 rounded-lg font-semibold border transition-all ${
+                      currency === "USD"
+                        ? "bg-[#171717] text-white border-[#171717]"
+                        : "bg-white text-[#71717A] border-[#E8E4DC]"
+                    }`}
+                  >
+                    🌍 USD ($ Card)
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-1 text-xs">
+                <Link
+                  href="/order-tracking"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block uppercase tracking-wider text-[#71717A] hover:text-[#171717] font-medium"
+                >
+                  Track Your Consignment
+                </Link>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-1.5 uppercase tracking-wider text-[#B58A52] font-semibold"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Admin & Operations Portal</span>
+                </Link>
+              </div>
+
+              <p className="text-[10px] text-[#A1A1AA] pt-1 border-t border-[#F0ECE3]">
                 Concierge: {storeConfig.contactPhone}
               </p>
             </div>

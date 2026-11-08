@@ -4,12 +4,10 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/products/ProductCard";
 import { PRODUCTS, CATEGORIES } from "@/lib/mock-data";
-import { useCurrency } from "@/context/CurrencyContext";
 import { Filter, SlidersHorizontal, X, RotateCcw } from "lucide-react";
 
 export function ShopClient() {
   const searchParams = useSearchParams();
-  const { format, currency } = useCurrency();
 
   const [productsList, setProductsList] = useState(PRODUCTS);
 
@@ -32,19 +30,39 @@ export function ShopClient() {
 
   const [selectedCategory, setSelectedCategory] = useState(initialCategory || "all");
   const [selectedGender, setSelectedGender] = useState(initialGender || "all");
-  const [sortBy, setSortBy] = useState("featured");
+  const [sortBy, setSortBy] = useState(() => (
+    initialFilter === "new" ? "newest" : initialFilter === "bestseller" ? "rating" : "featured"
+  ));
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   // Sync state if URL query params change
-  useEffect(() => {
+  const [prevParams, setPrevParams] = useState({
+    category: initialCategory,
+    gender: initialGender,
+    search: initialSearch,
+    filter: initialFilter,
+  });
+
+  if (
+    prevParams.category !== initialCategory ||
+    prevParams.gender !== initialGender ||
+    prevParams.search !== initialSearch ||
+    prevParams.filter !== initialFilter
+  ) {
+    setPrevParams({
+      category: initialCategory,
+      gender: initialGender,
+      search: initialSearch,
+      filter: initialFilter,
+    });
     if (initialCategory) setSelectedCategory(initialCategory);
     if (initialGender) setSelectedGender(initialGender);
     if (initialSearch) setSearchQuery(initialSearch);
     if (initialFilter === "new") setSortBy("newest");
     if (initialFilter === "bestseller") setSortBy("rating");
-  }, [initialCategory, initialGender, initialSearch, initialFilter]);
+  }
 
   const filteredProducts = useMemo(() => {
     return productsList
@@ -315,9 +333,9 @@ export function ShopClient() {
               Showing <strong>{filteredProducts.length}</strong> luxurious designs
             </div>
 
-            {/* Product Grid */}
+            {/* Product Grid: 2 cols on mobile, 3 cols on tablet/desktop */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -344,6 +362,146 @@ export function ShopClient() {
           </main>
         </div>
       </div>
+
+      {/* Mobile Filter Slide-In Drawer */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end lg:hidden">
+          <div
+            className="fixed inset-0 bg-[#171717]/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileFilterOpen(false)}
+          />
+          <div className="relative w-full max-w-xs sm:max-w-sm bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between py-6 px-5 sm:px-6 z-10 overflow-y-auto pb-safe">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-[#E8E4DC]">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-[#B58A52]" />
+                  <h3 className="font-serif text-lg font-bold text-[#171717]">
+                    Refine Catalog
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setMobileFilterOpen(false)}
+                  className="p-1.5 text-[#71717A] hover:text-[#171717] rounded-full hover:bg-white"
+                  aria-label="Close filters drawer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Department Categories Filter */}
+              <div className="py-4 border-b border-[#F0ECE3] space-y-2">
+                <label className="text-[11px] uppercase tracking-wider font-bold text-[#71717A] block">
+                  Department
+                </label>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => setSelectedCategory("all")}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg transition-colors ${
+                      selectedCategory === "all"
+                        ? "bg-[#171717] text-white font-semibold"
+                        : "text-[#171717] hover:bg-[#F0ECE3]"
+                    }`}
+                  >
+                    <span>All Departments</span>
+                    <span className="text-[10px]">{productsList.length}</span>
+                  </button>
+                  {CATEGORIES.map((cat) => {
+                    const count = productsList.filter((p) => p.category === cat.slug).length;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.slug)}
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg transition-colors ${
+                          selectedCategory === cat.slug
+                            ? "bg-[#171717] text-white font-semibold"
+                            : "text-[#171717] hover:bg-[#F0ECE3]"
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        <span className="text-[10px]">{count}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Audience / Gender Filter */}
+              <div className="py-4 border-b border-[#F0ECE3] space-y-2">
+                <label className="text-[11px] uppercase tracking-wider font-bold text-[#71717A] block">
+                  Audience / Gender
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "All", value: "all" },
+                    { label: "Women", value: "WOMEN" },
+                    { label: "Men", value: "MEN" },
+                    { label: "Unisex", value: "UNISEX" },
+                  ].map((g) => (
+                    <button
+                      key={g.value}
+                      onClick={() => setSelectedGender(g.value)}
+                      className={`text-xs py-2 px-3 rounded-lg border text-center font-medium transition-colors ${
+                        selectedGender === g.value
+                          ? "bg-[#B58A52] text-white border-[#B58A52]"
+                          : "bg-white text-[#71717A] border-[#E8E4DC]"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sort By inside drawer */}
+              <div className="py-4 border-b border-[#F0ECE3] space-y-2">
+                <label className="text-[11px] uppercase tracking-wider font-bold text-[#71717A] block">
+                  Sort Order
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full text-xs bg-white border border-[#E8E4DC] rounded-lg px-3 py-2 text-[#171717] focus:outline-none focus:border-[#B58A52]"
+                >
+                  <option value="featured">Featured Curations</option>
+                  <option value="newest">Newest Arrivals</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                </select>
+              </div>
+
+              {/* In stock available only */}
+              <div className="pt-4">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-[#171717]">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    className="rounded border-[#E8E4DC] text-[#B58A52] focus:ring-[#B58A52] w-4 h-4"
+                  />
+                  <span>In Stock Available Only</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Drawer Actions */}
+            <div className="pt-6 border-t border-[#E8E4DC] flex items-center gap-3">
+              <button
+                onClick={resetFilters}
+                className="flex-1 py-3 bg-white border border-[#E8E4DC] text-[#171717] text-xs uppercase tracking-wider font-semibold rounded-xl hover:bg-[#FAF8F5] transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="flex-1 py-3 bg-[#171717] hover:bg-[#B58A52] text-white text-xs uppercase tracking-wider font-bold rounded-xl transition-colors shadow-sm"
+              >
+                Apply ({filteredProducts.length})
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 export const storeConfig = {
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://maisonatelier.com",
   brandName: process.env.NEXT_PUBLIC_BRAND_NAME || "MAISON ATELIER",
   brandMonogram: "M·A",
   tagline: "Timeless Design. Modern Essence.",

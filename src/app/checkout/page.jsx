@@ -2,22 +2,18 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useCurrency } from "@/context/CurrencyContext";
 import { storeConfig } from "@/lib/store-config";
 import { PAKISTAN_CITIES, INTERNATIONAL_COUNTRIES } from "@/lib/mock-data";
 import {
-  ShieldCheck,
   Truck,
   CreditCard,
   Banknote,
-  Building,
   Check,
   Lock,
   Globe,
-  Sparkles,
 } from "lucide-react";
 
 export default function CheckoutPage() {
@@ -130,6 +126,7 @@ export default function CheckoutPage() {
       },
       items: items.map((i) => ({
         productId: i.productId,
+        variantId: i.selectedVariant?.id || null,
         productName: i.product.name,
         productImage: i.product.images[0]?.url || "",
         size: i.selectedVariant.size,
@@ -138,16 +135,14 @@ export default function CheckoutPage() {
         price: marketMode === "PK" ? i.unitPricePKR : i.unitPriceUSD,
         quantity: i.quantity,
       })),
+      market: marketMode,
       currency: marketMode === "PK" ? "PKR" : currency,
-      subtotal: marketMode === "PK" ? subtotalPKR : subtotalUSD,
-      shippingCost: marketMode === "PK" ? shippingCostPKR : shippingCostUSD,
-      discount: marketMode === "PK" ? discountAmountPKR : discountAmountUSD,
-      total: marketMode === "PK" ? finalTotalPKR : finalTotalUSD,
+      couponCode: coupon?.code || null,
       paymentMethod,
-      paymentStatus: paymentMethod === "COD" ? "PENDING" : "PAID",
-      orderStatus: paymentMethod === "COD" ? "PENDING_VERIFICATION" : "CONFIRMED",
-      courierName: marketMode === "PK" ? "Leopard Courier Express" : "DHL Express Priority",
-      notes: paymentMethod === "COD" ? "National Order: Cash on Delivery. Call customer for confirmation before dispatch." : "International Order: Paid via Card. Dispatched via DHL Priority.",
+      notes:
+        paymentMethod === "COD"
+          ? "National Order: Cash on Delivery. Call customer for confirmation before dispatch."
+          : "International Order: Paid via Card. Dispatched via DHL Priority.",
     };
 
     try {
@@ -159,6 +154,13 @@ export default function CheckoutPage() {
       });
 
       const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorNotice(data.error || "Order placement failed. Please verify your information.");
+        setIsSubmitting(false);
+        return;
+      }
+
       const savedOrder = data.order || orderPayload;
 
       // Save in localStorage as well for offline confirmation view
@@ -218,11 +220,11 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          <div className="flex rounded-lg p-1 bg-[#FAF8F5] border border-[#E8E4DC]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 w-full sm:w-auto p-1 bg-[#FAF8F5] border border-[#E8E4DC] rounded-xl shrink-0">
             <button
               type="button"
               onClick={() => handleMarketSwitch("PK")}
-              className={`px-4 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+              className={`w-full text-center px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 marketMode === "PK"
                   ? "bg-[#171717] text-[#FAF8F5] shadow-sm"
                   : "text-[#71717A] hover:text-[#171717]"
@@ -233,7 +235,7 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={() => handleMarketSwitch("INTL")}
-              className={`px-4 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+              className={`w-full text-center px-4 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 marketMode === "INTL"
                   ? "bg-[#171717] text-[#FAF8F5] shadow-sm"
                   : "text-[#71717A] hover:text-[#171717]"
@@ -406,6 +408,19 @@ export default function CheckoutPage() {
                       placeholder="e.g. DHA Phase 5 / Clifton"
                       value={addressLine2}
                       onChange={(e) => setAddressLine2(e.target.value)}
+                      className="w-full text-xs px-3.5 py-2.5 bg-[#FAF8F5] border border-[#E8E4DC] rounded-lg text-[#171717] focus:outline-none focus:border-[#B58A52]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs uppercase tracking-wider font-semibold text-[#171717] block mb-1.5">
+                      State / Province
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={marketMode === "PK" ? "e.g. Punjab / Sindh" : "e.g. California / London"}
+                      value={stateProvince}
+                      onChange={(e) => setStateProvince(e.target.value)}
                       className="w-full text-xs px-3.5 py-2.5 bg-[#FAF8F5] border border-[#E8E4DC] rounded-lg text-[#171717] focus:outline-none focus:border-[#B58A52]"
                     />
                   </div>

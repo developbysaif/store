@@ -125,3 +125,34 @@ h1, h2, h3, .font-serif {
 .shine-sweep:hover::after {
   transform: translateX(350%) skewX(-25deg);
 }
+
+/* Touch & Mobile UX Optimizations */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile Safe Areas for Home Indicators */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* Respect user's reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-spin,
+  .shine-sweep::after {
+    animation: none !important;
+    transform: none !important;
+  }
+}

@@ -2,12 +2,10 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCurrency } from "@/context/CurrencyContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { storeConfig } from "@/lib/store-config";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductHero3D } from "@/components/products/ProductHero3D";
 import {
@@ -17,11 +15,9 @@ import {
   Truck,
   RotateCcw,
   ShieldCheck,
-  ChevronRight,
   HelpCircle,
   X,
   CreditCard,
-  Sparkles,
 } from "lucide-react";
 
 export function ProductDetailClient({ product, relatedProducts }) {
@@ -63,38 +59,16 @@ export function ProductDetailClient({ product, relatedProducts }) {
       />
 
       {/* 2. Detailed Sizing, Technical Accordions, and Logistics */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Navigation Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs uppercase tracking-wider text-[#71717A] mb-10 pb-4 border-b border-[#E8E4DC]">
-          <Link href="/" className="hover:text-[#171717] transition-colors">
-            Home
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <Link href="/shop" className="hover:text-[#171717] transition-colors">
-            Shop
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <Link
-            href={`/category/${product.category}`}
-            className="hover:text-[#171717] transition-colors capitalize"
-          >
-            {product.category}
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-[#171717] font-semibold truncate max-w-[200px]">
-            {product.name}
-          </span>
-        </nav>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Left: Size Selector & Purchase Controls (6 cols) */}
-          <div className="lg:col-span-6 bg-white p-8 rounded-2xl border border-[#E8E4DC] shadow-xs space-y-6">
+          <div className="lg:col-span-6 bg-white p-5 sm:p-8 rounded-2xl border border-[#E8E4DC] shadow-xs space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-[#F0ECE3]">
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-widest text-[#B58A52] block">
                   Configuration
                 </span>
-                <h3 className="font-serif text-2xl text-[#171717]">
+                <h3 className="font-serif text-xl sm:text-2xl text-[#171717]">
                   Sizing & Acquisition
                 </h3>
               </div>
@@ -131,7 +105,7 @@ export function ProductDetailClient({ product, relatedProducts }) {
                     <span>Sartorial Sizing Guide</span>
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2 sm:gap-2.5">
                   {product.variants
                     .filter((v) => v.size)
                     .map((v) => {
@@ -140,7 +114,7 @@ export function ProductDetailClient({ product, relatedProducts }) {
                         <button
                           key={v.id}
                           onClick={() => setSelectedVariant(v)}
-                          className={`min-w-14 px-4 py-2.5 text-xs uppercase tracking-wider font-bold rounded-xl border transition-all ${
+                          className={`min-w-12 sm:min-w-14 px-3 sm:px-4 py-2 sm:py-2.5 text-xs uppercase tracking-wider font-bold rounded-xl border transition-all ${
                             isSelected
                               ? "bg-[#171717] text-[#FAF8F5] border-[#171717] shadow-md scale-105"
                               : "bg-white text-[#171717] border-[#E8E4DC] hover:border-[#B58A52]"
@@ -162,16 +136,18 @@ export function ProductDetailClient({ product, relatedProducts }) {
               <div className="inline-flex items-center border border-[#E8E4DC] rounded-xl bg-[#FAF8F5]">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-3.5 py-2 text-[#71717A] hover:text-[#171717]"
+                  aria-label="Decrease quantity"
+                  className="w-11 h-11 flex items-center justify-center text-[#71717A] hover:text-[#171717] cursor-pointer"
                 >
                   -
                 </button>
-                <span className="px-4 text-xs font-bold text-[#171717]">
+                <span className="px-3 text-xs font-bold text-[#171717]">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity((q) => Math.min(selectedVariant?.stock || 10, q + 1))}
-                  className="px-3.5 py-2 text-[#71717A] hover:text-[#171717]"
+                  aria-label="Increase quantity"
+                  className="w-11 h-11 flex items-center justify-center text-[#71717A] hover:text-[#171717] cursor-pointer"
                 >
                   +
                 </button>
@@ -180,22 +156,36 @@ export function ProductDetailClient({ product, relatedProducts }) {
 
             {/* Action Buttons */}
             <div className="space-y-3 pt-2">
-              <button
-                onClick={handleAddToCart}
-                disabled={(selectedVariant?.stock ?? 1) <= 0}
-                className="w-full py-4 bg-[#171717] hover:bg-[#B58A52] text-[#FAF8F5] text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 rounded-xl shadow-xl flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{addedNotice ? "Added to Shopping Bag!" : "Add to Bag"}</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={(selectedVariant?.stock ?? 1) <= 0}
+                  className="flex-1 py-3.5 sm:py-4 bg-[#171717] hover:bg-[#B58A52] text-[#FAF8F5] text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 rounded-xl shadow-xl flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>{addedNotice ? "Added to Shopping Bag!" : "Add to Bag"}</span>
+                </button>
+
+                <button
+                  onClick={() => toggleWishlist(product.id)}
+                  aria-label={isFavorited ? "Remove piece from wishlist" : "Save piece to wishlist"}
+                  className={`p-3.5 border rounded-xl transition-all cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center ${
+                    isFavorited
+                      ? "bg-red-50 border-red-200 text-red-600"
+                      : "bg-white border-[#E8E4DC] text-[#171717] hover:border-[#171717]"
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorited ? "fill-current text-red-500" : ""}`} />
+                </button>
+              </div>
 
               <button
                 onClick={handleBuyNow}
                 disabled={(selectedVariant?.stock ?? 1) <= 0}
-                className="w-full py-3.5 bg-white border border-[#171717] hover:bg-[#171717] hover:text-[#FAF8F5] text-[#171717] text-xs uppercase tracking-[0.16em] font-semibold transition-all duration-300 rounded-xl flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full py-3 sm:py-3.5 bg-white border border-[#171717] hover:bg-[#171717] hover:text-[#FAF8F5] text-[#171717] text-xs uppercase tracking-[0.16em] font-semibold transition-all duration-300 rounded-xl flex items-center justify-center gap-2 shadow-xs cursor-pointer min-h-[44px]"
               >
                 <CreditCard className="w-4 h-4" />
-                <span>
+                <span className="truncate">
                   {isPakistanMarket
                     ? "Order with Cash on Delivery (Instant Checkout)"
                     : "Instant Global Express Checkout"}
@@ -204,24 +194,24 @@ export function ProductDetailClient({ product, relatedProducts }) {
             </div>
 
             {/* Guarantees Bar */}
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-[#F0ECE3] text-center text-[11px] text-[#71717A]">
-              <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-4 border-t border-[#F0ECE3] text-center text-[10px] sm:text-[11px] text-[#71717A]">
+              <div className="p-2 sm:p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
                 <Truck className="w-4 h-4 text-[#B58A52] mx-auto" />
-                <span>2-4 Days Delivery</span>
+                <span className="block leading-tight">2-4 Days Delivery</span>
               </div>
-              <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
+              <div className="p-2 sm:p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
                 <RotateCcw className="w-4 h-4 text-[#B58A52] mx-auto" />
-                <span>14 Days Returns</span>
+                <span className="block leading-tight">14 Days Returns</span>
               </div>
-              <div className="p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
+              <div className="p-2 sm:p-2.5 bg-[#FAF8F5] rounded-xl border border-[#E8E4DC] space-y-1">
                 <ShieldCheck className="w-4 h-4 text-[#B58A52] mx-auto" />
-                <span>Authentic Guarantee</span>
+                <span className="block leading-tight">Authentic Guarantee</span>
               </div>
             </div>
           </div>
 
           {/* Right: Technical Accordion Tabs & Manifest (6 cols) */}
-          <div className="lg:col-span-6 bg-white p-8 rounded-2xl border border-[#E8E4DC] shadow-xs space-y-6">
+          <div className="lg:col-span-6 bg-white p-5 sm:p-8 rounded-2xl border border-[#E8E4DC] shadow-xs space-y-6">
             <div className="flex border-b border-[#E8E4DC]">
               <button
                 onClick={() => setActiveTab("details")}
@@ -320,7 +310,7 @@ export function ProductDetailClient({ product, relatedProducts }) {
                 You May Also Admire
               </h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -392,6 +382,47 @@ export function ProductDetailClient({ product, relatedProducts }) {
           </div>
         </div>
       )}
+
+      {/* Sticky Mobile Add to Cart Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md px-4 py-2.5 border-t border-[#E8E4DC] lg:hidden shadow-2xl pb-safe">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="relative w-10 h-10 rounded-lg bg-[#FAF8F5] border border-[#E8E4DC] overflow-hidden shrink-0">
+              <Image
+                src={product.images?.[0]?.url || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=300"}
+                alt={product.name}
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-semibold text-[#171717] truncate">
+                {product.name}
+              </div>
+              <div className="text-[11px] text-[#B58A52] font-medium font-serif">
+                {format(
+                  product.basePricePKR + (selectedVariant?.priceAdjustment || 0),
+                  product.basePriceUSD
+                )}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleAddToCart}
+            disabled={(selectedVariant?.stock ?? 1) <= 0}
+            className={`px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider font-bold transition-all shadow-md shrink-0 flex items-center gap-1.5 min-h-[44px] cursor-pointer ${
+              addedNotice
+                ? "bg-[#10B981] text-white"
+                : "bg-[#171717] hover:bg-[#B58A52] text-white"
+            }`}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span>{addedNotice ? "Added" : "Add to Bag"}</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

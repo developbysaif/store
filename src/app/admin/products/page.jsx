@@ -3,15 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CATEGORIES } from "@/lib/mock-data";
 import {
   Plus,
   Search,
   Edit2,
   Trash2,
-  Check,
-  AlertTriangle,
-  X,
   ExternalLink,
   Save,
   Zap,
@@ -45,23 +41,38 @@ export default function AdminProductsPage() {
   const [formSize, setFormSize] = useState("M");
   const [formColor, setFormColor] = useState("Classic Noir");
 
-  const loadProducts = async () => {
+  const refreshProducts = async () => {
     try {
-      setLoading(true);
       const res = await fetch("/api/products");
       const data = await res.json();
       if (data && data.products) {
         setProductsList(data.products);
       }
     } catch (err) {
-      console.error("Error loading products:", err);
-    } finally {
-      setLoading(false);
+      console.error("Error refreshing products:", err);
     }
   };
 
   useEffect(() => {
-    loadProducts();
+    let isMounted = true;
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted) {
+          if (data && data.products) {
+            setProductsList(data.products);
+          }
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading products:", err);
+        if (isMounted) setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Quick Edit Start
@@ -87,7 +98,7 @@ export default function AdminProductsPage() {
       });
       if (res.ok) {
         setQuickEditId(null);
-        loadProducts();
+        refreshProducts();
       }
     } catch (err) {
       console.error("Quick edit save failed:", err);
@@ -104,7 +115,7 @@ export default function AdminProductsPage() {
         method: "DELETE",
       });
       if (res.ok) {
-        loadProducts();
+        refreshProducts();
       }
     } catch (err) {
       console.error("Delete product error:", err);
@@ -174,7 +185,7 @@ export default function AdminProductsPage() {
         });
         setIsAddModalOpen(false);
       }
-      loadProducts();
+      refreshProducts();
     } catch (err) {
       console.error("Product submit failed:", err);
     }
@@ -270,7 +281,14 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F4F4F6]">
-              {filtered.map((product) => {
+              {loading ? (
+                [1, 2, 3, 4, 5].map((n) => (
+                  <tr key={n} className="animate-pulse">
+                    <td colSpan={6} className="py-4 px-4 h-14 bg-[#FAF8F5]/50" />
+                  </tr>
+                ))
+              ) : (
+                filtered.map((product) => {
                 const isQuickEditing = quickEditId === product.id;
                 const currentStock = product.variants?.[0]?.stock ?? product.stock ?? 10;
 
@@ -422,7 +440,7 @@ export default function AdminProductsPage() {
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>

@@ -35,13 +35,13 @@ export function TrendingGrid() {
             </h2>
           </div>
 
-          {/* Department Tabs */}
-          <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+          {/* Department Tabs with Touch Horizontal Scroll on Mobile */}
+          <div className="flex items-center gap-2 mt-4 md:mt-0 overflow-x-auto no-scrollbar pb-1 max-w-full">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
-                className={`px-4 py-1.5 text-xs uppercase tracking-wider rounded-full transition-all duration-200 cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-1.5 text-[11px] sm:text-xs uppercase tracking-wider rounded-full transition-all duration-200 cursor-pointer shrink-0 ${
                   activeTab === tab.value
                     ? "bg-[#171717] text-[#FAF8F5] font-semibold shadow-sm"
                     : "bg-white text-[#71717A] hover:text-[#171717] border border-[#E8E4DC]"
@@ -53,8 +53,8 @@ export function TrendingGrid() {
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+        {/* Products Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

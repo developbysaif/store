@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { storeConfig } from "@/lib/store-config";
-import { Save, Check, RefreshCw, Sparkles, Building, Globe } from "lucide-react";
+import { Save, Check, Sparkles, Building, Globe } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [brandName, setBrandName] = useState(storeConfig.brandName);

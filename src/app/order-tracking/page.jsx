@@ -1,9 +1,18 @@
 import React, { Suspense } from "react";
+import { storeConfig } from "@/lib/store-config";
 import { OrderTrackingClient } from "./OrderTrackingClient";
 
 export const metadata = {
-  title: "Consignment & Order Tracking — Haute Couture Logistics",
-  description: "Track the real-time fulfillment status of your luxury parcel.",
+  title: `Consignment & Courier Tracking — ${storeConfig.brandName} Logistics`,
+  description:
+    "Track the real-time fulfillment and courier dispatch status of your luxury parcel across Leopard Courier, TCS, or DHL Express.",
+  alternates: {
+    canonical: `${storeConfig.siteUrl}/order-tracking`,
+  },
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function OrderTrackingPage() {
